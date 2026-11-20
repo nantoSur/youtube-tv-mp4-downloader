@@ -55,8 +55,14 @@ Butuh Windows 10/11 x64 dan koneksi internet. Node.js 18+ hanya diperlukan untuk
 ### Membuat installer
 
 1. Install [Inno Setup 6](https://jrsoftware.org/isinfo.php).
-2. Kompilasi `installer/setup.iss` dengan `ISCC.exe`.
+2. Kompilasi `installer/setup.iss` dengan `ISCC.exe` (path sumber sudah relatif, jadi bisa langsung dikompilasi dari folder mana pun).
 3. Hasil: `installer/TV_YouTube_Downloader_Setup.exe`.
+
+Script otomatis mencari `node.exe` di `%ProgramFiles%\nodejs` maupun `%ProgramW6432%\nodejs`. Kalau Node terinstall di tempat lain, tentukan sendiri:
+
+```bat
+ISCC.exe /dNodeExe="D:\path\node.exe" installer\setup.iss
+```
 
 Installer memasang aplikasi ke `%LOCALAPPDATA%\TV YouTube Downloader`, membuat shortcut Desktop dan Start Menu, serta mendaftarkan uninstaller.
 
@@ -131,8 +137,14 @@ Requires Windows 10/11 x64 and internet access. Node.js 18+ is only needed to ru
 ### Building the installer
 
 1. Install [Inno Setup 6](https://jrsoftware.org/isinfo.php).
-2. Compile `installer/setup.iss` with `ISCC.exe`.
+2. Compile `installer/setup.iss` with `ISCC.exe` (source paths are relative, so it works from any checkout location).
 3. Output: `installer/TV_YouTube_Downloader_Setup.exe`.
+
+The script looks for `node.exe` in both `%ProgramFiles%\nodejs` and `%ProgramW6432%\nodejs`. If Node lives elsewhere, pass it explicitly:
+
+```bat
+ISCC.exe /dNodeExe="D:\path\node.exe" installer\setup.iss
+```
 
 The installer installs to `%LOCALAPPDATA%\TV YouTube Downloader`, creates desktop and Start Menu shortcuts, and registers an uninstaller.
 
