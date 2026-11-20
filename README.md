@@ -1,31 +1,117 @@
 # TV YouTube Downloader
 
-A tiny Windows app that downloads YouTube videos as **MP4 files that actually play on TVs**.
+[Bahasa Indonesia](#bahasa-indonesia) · [English](#english)
 
-Many YouTube downloads are delivered as *fragmented MP4* (DASH-style `moof`/`mdat` fragments after merging). Most smart TVs and USB media players reject that layout even when the file is named `.mp4` and uses H.264. This app fixes the container problem automatically, so the output works on TV without touching the video quality.
+---
 
-## Features
+## Bahasa Indonesia
 
-- Simple local web UI (opens automatically in the browser)
+Aplikasi Windows kecil yang mengunduh video YouTube menjadi **MP4 yang benar-benar bisa diputar di TV**.
+
+Banyak hasil download YouTube dikirim sebagai *fragmented MP4* (potongan `moof`/`mdat` ala DASH setelah proses gabung). Kebanyakan smart TV dan pemutar USB menolak struktur ini, bahkan kalau filenya bernama `.mp4` dan memakai H.264. Aplikasi ini otomatis memperbaiki masalah container tersebut, sehingga hasilnya langsung bisa diputar di TV tanpa mengorbankan kualitas gambar.
+
+### Kenapa ini dibuat
+
+File yang kelihatannya valid di komputer bisa saja ditolak TV dengan pesan "unsupported". Penyebabnya bukan codec-nya, melainkan struktur file: `moov` berukuran kecil dan isi video terbagi-bagi menjadi fragmen `moof/mdat`. Aplikasi ini merapikan struktur itu menjadi MP4 progressive dan memindahkan `moov` ke depan file (`+faststart`).
+
+### Fitur
+
+- UI web lokal yang otomatis terbuka di browser
+- Pilihan kualitas: 360p / 480p / 720p / 1080p / terbaik
+- Memilih stream `avc1` (H.264) + `mp4a` (AAC) — pasangan codec yang dipahami TV
+- Hasil gabungan diperiksa dengan `ffprobe`:
+  - codec sudah aman → di-remux tanpa re-encode (kualitas identik)
+  - codec tidak aman → otomatis dikonversi ke H.264 + AAC
+- Selalu menghasilkan **MP4 progressive dengan `+faststart`** (`ftyp → moov → mdat`)
+- Bar progres dengan persen global, kecepatan, ETA, dan animasi
+- Tombol batal, tombol buka lokasi file, dan pembaruan yt-dlp sendiri
+- Installer Windows (Inno Setup) dengan shortcut Desktop/Start Menu dan Node.js yang sudah dibundling
+
+### Teknologi
+
+- **Node.js** — tanpa dependency npm; memakai `http`, `child_process`, `fs` bawaan
+- **yt-dlp** — ekstraksi dan download dari YouTube
+- **FFmpeg / ffprobe** — inspeksi codec, remux, dan transcoding cadangan
+- **HTML / CSS / JavaScript murni** — UI satu halaman
+- **Inno Setup 6** — installer `.exe`
+
+### Cara kerja
+
+1. UI mengirim URL + kualitas ke server Node lokal (`127.0.0.1:7777`).
+2. Server menjalankan yt-dlp dengan format yang mengutamakan H.264 + AAC lalu menggabungkannya ke MP4.
+3. `ffprobe` memeriksa hasilnya. Codec aman disalin apa adanya; codec tidak aman ditranscode.
+4. FFmpeg meremux menjadi MP4 non-fragmented dan memindahkan atom `moov` ke depan (`+faststart`).
+5. Browser melakukan polling ke `/api/status` dan menampilkan bar 0 → 100% yang tidak pernah mundur (video 2–60%, audio 60–85%, gabung 87%, proses akhir 90–99%).
+
+### Menjalankan dari source
+
+```bat
+setup.bat      :: mengunduh yt-dlp.exe dan menginstall ffmpeg lewat winget jika belum ada
+start.bat      :: menjalankan aplikasi dan membuka http://127.0.0.1:7777
+```
+
+Butuh Windows 10/11 x64 dan koneksi internet. Node.js 18+ hanya diperlukan untuk menjalankan dari source — installer sudah membundling Node.js.
+
+### Membuat installer
+
+1. Install [Inno Setup 6](https://jrsoftware.org/isinfo.php).
+2. Kompilasi `installer/setup.iss` dengan `ISCC.exe`.
+3. Hasil: `installer/TV_YouTube_Downloader_Setup.exe`.
+
+Installer memasang aplikasi ke `%LOCALAPPDATA%\TV YouTube Downloader`, membuat shortcut Desktop dan Start Menu, serta mendaftarkan uninstaller.
+
+### Struktur proyek
+
+```
+app.js                  server HTTP lokal + pipeline download/cek/remux
+public/index.html       UI web bertema pink (tanpa framework)
+bin/yt-dlp.exe          diunduh oleh setup.bat (tidak masuk git)
+launch.vbs              launcher tersembunyi untuk aplikasi terinstall
+start.bat               launcher untuk development
+setup.bat               bootstrap alat saat pertama kali
+icon-round.ico          aset ikon aplikasi
+installer/setup.iss     skrip Inno Setup
+README.md / LICENSE
+```
+
+### Catatan
+
+`yt-dlp.exe` dan installer yang sudah dikompilasi sengaja tidak dimasukkan ke git (`.gitignore`); `setup.bat` akan mengunduhnya lagi saat clone bersih. FFmpeg dicari dari `PATH`, lokasi instalasi winget, atau folder `bin/`.
+
+---
+
+## English
+
+A small Windows app that downloads YouTube videos as **MP4 files that actually play on TVs**.
+
+Many YouTube downloads arrive as *fragmented MP4* (DASH-style `moof`/`mdat` fragments after merging). Most smart TVs and USB media players reject that layout even when the file is named `.mp4` and uses H.264. This app fixes the container problem automatically, so the output works on TV without touching the video quality.
+
+### Why
+
+A file that looks perfectly fine on a PC can still be rejected by a TV with an "unsupported" message. The culprit is usually the container structure, not the codec: a tiny `moov` atom with the actual media split into `moof/mdat` fragments. This app rewrites it into a progressive MP4 and moves `moov` to the front (`+faststart`).
+
+### Features
+
+- Simple local web UI that opens automatically in the browser
 - Quality presets: 360p / 480p / 720p / 1080p / best
 - Prefers `avc1` (H.264) + `mp4a` (AAC) streams — the codec pair TVs understand
 - Verifies the merged file with `ffprobe`:
-  - if codecs are already TV-safe → lossless remux (no re-encode)
-  - otherwise → transcodes to H.264 + AAC automatically
+  - already TV-safe → lossless remux (no re-encode)
+  - not safe → automatic transcode to H.264 + AAC
 - Always writes a **progressive MP4 with `+faststart`** (`ftyp → moov → mdat`)
 - Live progress bar with global percentage, speed, ETA and animations
-- Cancel button, "open file location" button, yt-dlp self-update
-- Windows installer (Inno Setup) with desktop/Start Menu shortcuts and bundled Node.js runtime
+- Cancel button, "open file location" button, and yt-dlp self-update
+- Windows installer (Inno Setup) with desktop/Start Menu shortcuts and a bundled Node.js runtime
 
-## Tech stack
+### Tech stack
 
 - **Node.js** — zero npm dependencies; plain `http`, `child_process`, `fs`
-- **yt-dlp** — YouTube extraction/downloading
+- **yt-dlp** — YouTube extraction and downloading
 - **FFmpeg / ffprobe** — codec inspection, remux and fallback transcode
 - **Vanilla HTML / CSS / JavaScript** — single-page local UI
 - **Inno Setup 6** — `.exe` installer
 
-## How it works
+### How it works
 
 1. The UI sends the URL + quality to a local Node server (`127.0.0.1:7777`).
 2. The server runs yt-dlp with a format chain that prefers H.264 + AAC and merges into MP4.
@@ -33,16 +119,16 @@ Many YouTube downloads are delivered as *fragmented MP4* (DASH-style `moof`/`mda
 4. FFmpeg remuxes to a non-fragmented MP4 and moves the `moov` atom to the front (`+faststart`).
 5. The browser polls `/api/status` and animates a monotonic 0 → 100% progress bar (video 2–60%, audio 60–85%, merge 87%, finishing 90–99%).
 
-## Getting started
+### Getting started
 
 ```bat
 setup.bat      :: downloads yt-dlp.exe and installs ffmpeg via winget if missing
 start.bat      :: starts the app and opens http://127.0.0.1:7777
 ```
 
-Requirements: Windows 10/11 x64, Node.js 18+ (only for running from source — the installer bundles Node), internet access.
+Requires Windows 10/11 x64 and internet access. Node.js 18+ is only needed to run from source — the installer bundles Node.
 
-## Building the installer
+### Building the installer
 
 1. Install [Inno Setup 6](https://jrsoftware.org/isinfo.php).
 2. Compile `installer/setup.iss` with `ISCC.exe`.
@@ -50,7 +136,7 @@ Requirements: Windows 10/11 x64, Node.js 18+ (only for running from source — t
 
 The installer installs to `%LOCALAPPDATA%\TV YouTube Downloader`, creates desktop and Start Menu shortcuts, and registers an uninstaller.
 
-## Project structure
+### Project structure
 
 ```
 app.js                  local HTTP server + download/verify/remux pipeline
@@ -59,11 +145,11 @@ bin/yt-dlp.exe          downloaded by setup.bat (not committed)
 launch.vbs              hidden launcher used by the installed app
 start.bat               developer launcher
 setup.bat               first-run tool bootstrap
-icon-round.ico          app/icon asset
+icon-round.ico          app icon asset
 installer/setup.iss     Inno Setup script
 README.md / LICENSE
 ```
 
-## Notes
+### Notes
 
-`yt-dlp.exe` and the compiled installer are intentionally excluded from git (`.gitignore`); `setup.bat` recreates the tool on a fresh clone. FFmpeg is detected from `PATH`, from Inno/winget install locations, or from `bin/`.
+`yt-dlp.exe` and the compiled installer are intentionally excluded from git (`.gitignore`); `setup.bat` recreates the tool on a fresh clone. FFmpeg is detected from `PATH`, winget install locations, or the `bin/` folder.
