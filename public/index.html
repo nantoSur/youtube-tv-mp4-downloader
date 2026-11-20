@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TV YouTube Downloader</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(160deg, #fff0f6 0%, #ffe4ef 45%, #ffd6e8 100%);
+    min-height: 100vh;
+    color: #831843;
+    padding: 24px 16px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 24px; }
+  header h1 {
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #9d174d;
+    background: linear-gradient(90deg, #db2777, #ec4899, #f472b6, #db2777);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: titleHue 5s linear infinite;
+    display: inline-block;
+  }
+  @keyframes titleHue { to { background-position: 200% 0; } }
+  header p { color: #b4537f; font-size: 14px; margin-top: 6px; }
+  .chips { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .chip {
+    font-size: 12px; padding: 5px 12px; border-radius: 20px;
+    background: rgba(255,255,255,0.8); border: 1px solid #fbcfe8;
+    color: #9d174d; box-shadow: 0 2px 8px rgba(236,72,153,0.12);
+  }
+  .chip b { color: #db2777; font-weight: 700; }
+  .chip.bad b { color: #9f1239; }
+  .card {
+    background: rgba(255,255,255,0.85);
+    border: 1px solid #fbcfe8;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 32px rgba(236,72,153,0.14);
+    backdrop-filter: blur(10px);
+  }
+  label { display: block; font-size: 13px; color: #be185d; margin-bottom: 6px; font-weight: 600; }
+  .row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .row > div { flex: 1; }
+  input, select {
+    width: 100%; padding: 12px 14px; border-radius: 10px;
+    border: 1.5px solid #fbcfe8;
+    background: #fff; color: #831843; font-size: 14px;
+    outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus, select:focus { border-color: #ec4899; box-shadow: 0 0 0 3px rgba(236,72,153,0.15); }
+  input::placeholder { color: #e395b9; }
+  select option { background: #fff; color: #831843; }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  button {
+    padding: 12px 22px; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: transform .1s, opacity .15s, box-shadow .15s;
+  }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .primary {
+    background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; flex: 1;
+    box-shadow: 0 6px 18px rgba(236,72,153,0.35);
+  }
+  .primary:hover { box-shadow: 0 8px 24px rgba(236,72,153,0.5); }
+  .danger { background: linear-gradient(135deg, #fb7185, #e11d48); color: #fff; }
+  .ghost {
+    background: rgba(236,72,153,0.08); color: #be185d;
+    border: 1px solid #f9a8d4;
+  }
+  .green {
+    background: linear-gradient(135deg, #f472b6, #ec4899); color: #fff;
+    box-shadow: 0 6px 18px rgba(236,72,153,0.3);
+  }
+  .msg { font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600; }
+  .msg.err { color: #e11d48; }
+  .msg.ok { color: #db2777; }
+  #progressCard { display: none; }
+  .phead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .phase { font-size: 14px; font-weight: 700; color: #db2777; }
+  .subline { display: flex; gap: 14px; margin-top: 4px; font-size: 12px; color: #c06a94; }
+  .subline #meta { color: #ec4899; font-weight: 700; }
+  .pct {
+    font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums;
+    background: linear-gradient(90deg, #f472b6, #ec4899, #e879f9);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: pctHue 3s linear infinite;
+    display: inline-block;
+  }
+  .pct.pop { animation: pctHue 3s linear infinite, pctPop .35s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pctHue { to { background-position: 200% 0; } }
+  @keyframes pctPop { 0% { transform: scale(1); } 40% { transform: scale(1.22); } 100% { transform: scale(1); } }
+  .bar {
+    position: relative; height: 18px; border-radius: 12px;
+    background: rgba(219,39,119,0.12);
+    box-shadow: inset 0 2px 7px rgba(190,24,93,0.18), inset 0 0 0 1px rgba(236,72,153,0.18);
+  }
+  .fill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #db2777, #ec4899, #f472b6, #e879f9);
+    background-size: 300% 100%;
+    animation: fillHue 4s linear infinite;
+    box-shadow: 0 0 16px rgba(236,72,153,0.55), 0 0 4px rgba(244,114,182,0.9);
+    transition: width .45s cubic-bezier(.22,1,.36,1);
+    overflow: hidden;
+  }
+  .fill::before {
+    content: ''; position: absolute; inset: -10px;
+    background: repeating-linear-gradient(-45deg,
+      rgba(255,255,255,0.32) 0 14px, rgba(255,255,255,0) 14px 28px);
+    animation: stripeMove .7s linear infinite;
+  }
+  .fill::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 45%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+    animation: shineSweep 1.7s ease-in-out infinite;
+  }
+  @keyframes fillHue { to { background-position: 300% 0; } }
+  @keyframes stripeMove { to { transform: translateX(-39.6px); } }
+  @keyframes shineSweep { 0% { left: -50%; } 100% { left: 110%; } }
+  .bounce {
+    position: absolute; top: 50%; left: 0%; z-index: 2;
+    width: 16px; height: 16px; margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff, #fbcfe8 55%, #ec4899);
+    box-shadow: 0 0 12px #f472b6, 0 0 26px rgba(236,72,153,0.75);
+    transition: left .45s cubic-bezier(.22,1,.36,1);
+    animation: hop .6s cubic-bezier(.45,0,.55,1) infinite;
+  }
+  @keyframes hop {
+    0%, 100% { transform: translateY(0) scale(1); }
+    30% { transform: translateY(-11px) scale(1.2); }
+    60% { transform: translateY(3px) scale(.88); }
+    80% { transform: translateY(-3px) scale(1.05); }
+  }
+  .donePulse .fill { animation: fillHue 4s linear infinite, doneGlow .9s ease-in-out infinite; }
+  .donePulse .bounce { animation: hop .6s cubic-bezier(.45,0,.55,1) infinite, doneGlow .9s ease-in-out infinite; }
+  @keyframes doneGlow { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.45); } }
+  #log {
+    background: #320a24; border: 1px solid rgba(236,72,153,0.3);
+    border-radius: 10px; padding: 12px; margin-top: 14px;
+    font-family: Consolas, 'Courier New', monospace; font-size: 12px;
+    max-height: 220px; overflow-y: auto; line-height: 1.7;
+    color: #fbcfe8; white-space: pre-wrap; word-break: break-all;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
+  }
+  .foot { text-align: center; color: #b4537f; font-size: 12px; line-height: 1.7; margin-top: 8px; }
+  .foot b { color: #db2777; }
+  #doneCard { display: none; }
+  .file-path {
+    font-family: Consolas, monospace; font-size: 12px; color: #be185d;
+    background: #fdf2f8; border: 1px dashed #f9a8d4;
+    padding: 10px 12px; border-radius: 8px;
+    margin: 12px 0; word-break: break-all;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>TV <span>YouTube</span> Downloader</h1>
+    <p>Download video YouTube → MP4 (H.264 + AAC) yang pasti bisa diputar di TV</p>
+    <div class="chips">
+      <div class="chip" id="chipYtdlp">yt-dlp: <b>...</b></div>
+      <div class="chip" id="chipFfmpeg">ffmpeg: <b>...</b></div>
+      <div class="chip" id="chipVer" style="display:none">ver: <b>...</b></div>
+      <button class="ghost" id="btnUpdate" style="padding:4px 12px;font-size:12px" onclick="updateYtdlp()">Update yt-dlp</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <label for="url">URL Video YouTube</label>
+    <input id="url" type="text" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" spellcheck="false">
+    <div class="row" style="margin-top:16px">
+      <div>
+        <label for="quality">Kualitas</label>
+        <select id="quality">
+          <option value="720" selected>720p HD (disarankan untuk TV)</option>
+          <option value="1080">1080p Full HD</option>
+          <option value="480">480p</option>
+          <option value="360">360p</option>
+          <option value="best">Kualitas terbaik</option>
+        </select>
+      </div>
+      <div>
+        <label for="folder">Folder tujuan (kosongkan = Downloads)</label>
+        <input id="folder" type="text" placeholder="C:\Users\...\Downloads" spellcheck="false">
+      </div>
+    </div>
+    <div class="btns">
+      <button class="primary" id="btnStart" onclick="start()">Download MP4 untuk TV</button>
+      <button class="danger" id="btnAbort" style="display:none" onclick="abort()">Batalkan</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="card" id="progressCard">
+    <div class="phead">
+      <div>
+        <div class="phase" id="phase">Menyiapkan...</div>
+        <div class="subline"><span id="elapsed"></span><span id="meta"></span></div>
+      </div>
+      <div class="pct" id="pct">0%</div>
+    </div>
+    <div class="bar" id="bar">
+      <div id="barFill" class="fill"></div>
+      <div id="bounce" class="bounce"></div>
+    </div>
+    <div id="log"></div>
+  </div>
+
+  <div class="card" id="doneCard">
+    <div style="font-weight:700;color:#db2777;font-size:15px">Download selesai — file siap diputar di TV</div>
+    <div class="file-path" id="doneFile"></div>
+    <div class="btns">
+      <button class="green" onclick="openFolder()">Buka lokasi file</button>
+      <button class="ghost" onclick="copyPath()">Salin path file</button>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>Cara pakai di TV:</b> salin file ke flashdisk → tancapkan ke TV → buka lewat pemutar file.<br>
+    Aplikasi ini otomatis merapikan struktur MP4 (progressive + faststart) dan memaksa codec H.264 + AAC,
+    sehingga file hasil download selalu kompatibel dengan TV.
+  </div>
+</div>
+
+<script>
+let lastLogLen = 0;
+let pollTimer = null;
+let currentFile = '';
+
+function $(id) { return document.getElementById(id); }
+
+function setMsg(text, cls) {
+  const el = $('msg');
+  el.textContent = text || '';
+  el.className = 'msg' + (cls ? ' ' + cls : '');
+}
+
+async function api(path, method, body) {
+  const opt = { method: method || 'GET', headers: { 'Content-Type': 'application/json' } };
+  if (body) opt.body = JSON.stringify(body);
+  const res = await fetch(path, opt);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+  return data;
+}
+
+async function loadTools() {
+  try {
+    const t = await api('/api/tools');
+    const c1 = $('chipYtdlp'), c2 = $('chipFfmpeg'), c3 = $('chipVer');
+    c1.innerHTML = 'yt-dlp: <b>' + (t.ytdlp || 'tidak ada') + '</b>';
+    c1.className = 'chip' + (t.ytdlp ? '' : ' bad');
+    c2.innerHTML = 'ffmpeg: <b>' + (t.ffmpeg ? 'OK' : 'tidak ada') + '</b>';
+    c2.className = 'chip' + (t.ffmpeg ? '' : ' bad');
+    if (t.ytdlp) { c3.style.display = ''; c3.innerHTML = 'ver: <b>' + t.ytdlp + '</b>'; }
+    if (!$('folder').value) $('folder').placeholder = t.defaultFolder;
+  } catch (e) {}
+}
+
+async function start() {
+  const url = $('url').value.trim();
+  if (!url) return setMsg('Tempel URL YouTube dulu', 'err');
+  setMsg('');
+  $('btnStart').disabled = true;
+  try {
+    await api('/api/download', 'POST', {
+      url: url,
+      quality: $('quality').value,
+      folder: $('folder').value.trim(),
+    });
+    $('doneCard').style.display = 'none';
+    $('progressCard').style.display = 'block';
+    $('log').innerHTML = '';
+    lastLogLen = 0;
+    poll();
+  } catch (e) {
+    setMsg(e.message, 'err');
+    $('btnStart').disabled = false;
+  }
+}
+
+async function abort() {
+  try { await api('/api/abort', 'POST'); } catch (e) {}
+}
+
+async function updateYtdlp() {
+  const btn = $('btnUpdate');
+  btn.disabled = true;
+  btn.textContent = 'Mengupdate...';
+  try {
+    const r = await api('/api/update', 'POST');
+    setMsg('yt-dlp terupdate: ' + r.version, 'ok');
+    loadTools();
+  } catch (e) {
+    setMsg(e.message, 'err');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Update yt-dlp';
+}
+
+async function openFolder() {
+  if (!currentFile) return;
+  try { await api('/api/open', 'POST', { path: currentFile }); } catch (e) { setMsg(e.message, 'err'); }
+}
+
+async function copyPath() {
+  if (!currentFile) return;
+  try {
+    await navigator.clipboard.writeText(currentFile);
+    setMsg('Path disalin ke clipboard', 'ok');
+  } catch (e) {
+    setMsg('Gagal menyalin: ' + e.message, 'err');
+  }
+}
+
+function fmtElapsed(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  return m + 'm ' + String(s % 60).padStart(2, '0') + 's';
+}
+
+async function poll() {
+  clearTimeout(pollTimer);
+  let s;
+  try {
+    s = await api('/api/status');
+  } catch (e) {
+    pollTimer = setTimeout(poll, 1500);
+    return;
+  }
+
+  $('progressCard').style.display = 'block';
+  $('phase').textContent = s.phase || s.state;
+
+  const pctText = s.percent + '%';
+  const pctEl = $('pct');
+  if (pctEl.textContent !== pctText) {
+    pctEl.textContent = pctText;
+    pctEl.classList.remove('pop');
+    void pctEl.offsetWidth;
+    pctEl.classList.add('pop');
+  }
+  $('barFill').style.width = s.percent + '%';
+  $('bounce').style.left = s.percent + '%';
+
+  const meta = [];
+  if (s.speed) meta.push(s.speed);
+  if (s.eta) meta.push('sisa ' + s.eta);
+  $('meta').textContent = meta.join('  ·  ');
+
+  $('bar').classList.toggle('donePulse', s.state === 'done');
+
+  if (s.startedAt && s.state === 'running') {
+    $('elapsed').textContent = 'berjalan ' + fmtElapsed(Date.now() - s.startedAt);
+  } else if (s.state === 'done') {
+    $('elapsed').textContent = '';
+  }
+
+  if (s.log.length !== lastLogLen) {
+    const logEl = $('log');
+    const atBottom = logEl.scrollTop + logEl.clientHeight >= logEl.scrollHeight - 40;
+    logEl.textContent = s.log.join('\n');
+    lastLogLen = s.log.length;
+    if (atBottom) logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  if (s.state === 'running') {
+    $('btnStart').disabled = true;
+    $('btnAbort').style.display = 'inline-block';
+    pollTimer = setTimeout(poll, 500);
+  } else {
+    $('btnStart').disabled = false;
+    $('btnAbort').style.display = 'none';
+    if (s.state === 'done') {
+      currentFile = s.file;
+      $('doneFile').textContent = s.file;
+      $('doneCard').style.display = 'block';
+      setMsg('Selesai!', 'ok');
+      loadTools();
+      pollTimer = setTimeout(poll, 4000);
+    } else if (s.state === 'error') {
+      if (s.error && s.error !== 'Dibatalkan') setMsg(s.error, 'err');
+      else if (s.error === 'Dibatalkan') setMsg('Dibatalkan', '');
+      pollTimer = setTimeout(poll, 4000);
+    } else {
+      pollTimer = setTimeout(poll, 4000);
+    }
+  }
+}
+
+$('url').addEventListener('keydown', (e) => { if (e.key === 'Enter') start(); });
+
+loadTools();
+poll();
+</script>
+</body>
+</html>

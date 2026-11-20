@@ -1,0 +1,7 @@
+bin/yt-dlp.exe
+bin/ffmpeg.exe
+bin/ffprobe.exe
+installer/*.exe
+node_modules/
+*.log
+*.tmp
