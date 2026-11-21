@@ -27,9 +27,14 @@
     background-attachment: fixed;
     min-height: 100vh;
     color: var(--text);
-    padding: 30px 16px 40px;
+    padding: 18px 16px 40px;
   }
-  .wrap { max-width: 780px; margin: 0 auto; }
+  .wrap { max-width: 780px; margin: 0 auto; position: relative; padding-top: 46px; }
+  .lang-switch {
+    position: absolute; top: 0; right: 0; display: flex; gap: 5px;
+    padding: 4px; border-radius: 999px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--line);
+  }
 
   /* ---- header ---- */
   header { text-align: center; margin-bottom: 26px; }
@@ -51,7 +56,7 @@
   .chip.bad b { color: #ff6b6b; }
 
   /* ---- language + equalizer ---- */
-  .ghost.lang { padding: 6px 12px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; }
+  .ghost.lang { padding: 6px 14px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; }
   .ghost.lang.active { background: var(--green); border-color: var(--green); color: #000; }
   .eq { display: inline-flex; align-items: flex-end; gap: 3px; height: 20px; margin-left: 2px; }
   .eq i {
@@ -211,6 +216,10 @@
 </head>
 <body>
 <div class="wrap">
+  <div class="lang-switch">
+    <button class="ghost lang active" data-lang="id" onclick="setLang('id')" title="Bahasa Indonesia">ID</button>
+    <button class="ghost lang" data-lang="en" onclick="setLang('en')" title="English">EN</button>
+  </div>
   <header>
     <div class="brand">
       <svg viewBox="0 0 32 32" aria-label="tvYD logo" xmlns="http://www.w3.org/2000/svg">
@@ -222,8 +231,6 @@
     </div>
     <p data-i18n="headerSub">Download video YouTube → MP4 (H.264 + AAC) yang pasti bisa diputar di TV</p>
     <div class="chips">
-      <button class="ghost lang active" data-lang="id" onclick="setLang('id')" title="Bahasa Indonesia">ID</button>
-      <button class="ghost lang" data-lang="en" onclick="setLang('en')" title="English">EN</button>
       <div class="chip" id="chipYtdlp">yt-dlp: <b>...</b></div>
       <div class="chip" id="chipFfmpeg">ffmpeg: <b>...</b></div>
       <div class="chip" id="chipVer" style="display:none">ver: <b>...</b></div>
