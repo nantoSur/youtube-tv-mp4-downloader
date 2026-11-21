@@ -13,6 +13,7 @@ const PUBLIC = path.join(ROOT, 'public');
 const BASE_PORT = 7777;
 
 const QUALITY_FORMATS = {
+  '2160': 'bv*[height<=2160][vcodec^=avc1]+ba[acodec^=mp4a]/bv*[height<=2160]+ba/b[height<=2160]',
   '1080': 'bv*[height<=1080][vcodec^=avc1]+ba[acodec^=mp4a]/bv*[height<=1080]+ba/b[height<=1080]',
   '720': 'bv*[height<=720][vcodec^=avc1]+ba[acodec^=mp4a]/bv*[height<=720]+ba/b[height<=720]',
   '480': 'bv*[height<=480][vcodec^=avc1]+ba[acodec^=mp4a]/bv*[height<=480]+ba/b[height<=480]',

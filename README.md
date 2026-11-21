@@ -18,7 +18,7 @@ File yang kelihatannya valid di komputer bisa saja ditolak TV dengan pesan "unsu
 
 - UI web lokal yang otomatis terbuka di browser
 - Sakelar bahasa **Indonesia / English** (pilihan tersimpan di browser); termasuk terjemahan progress, error, dan log
-- Pilihan kualitas: 360p / 480p / 720p / 1080p / terbaik
+- Pilihan kualitas: 360p / 480p / 720p / 1080p / **2160p 4K** / terbaik
 - Memilih stream `avc1` (H.264) + `mp4a` (AAC) — pasangan codec yang dipahami TV
 - Hasil gabungan diperiksa dengan `ffprobe`:
   - codec sudah aman → di-remux tanpa re-encode (kualitas identik)
@@ -102,7 +102,7 @@ A file that looks perfectly fine on a PC can still be rejected by a TV with an "
 
 - Simple local web UI that opens automatically in the browser
 - **Indonesian / English** language switch (remembered in your browser), including progress, errors and log lines
-- Quality presets: 360p / 480p / 720p / 1080p / best
+- Quality presets: 360p / 480p / 720p / 1080p / **2160p 4K** / best
 - Prefers `avc1` (H.264) + `mp4a` (AAC) streams — the codec pair TVs understand
 - Verifies the merged file with `ffprobe`:
   - already TV-safe → lossless remux (no re-encode)
