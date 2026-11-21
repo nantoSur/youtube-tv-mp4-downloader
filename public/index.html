@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TV YouTube Downloader</title>
+<title>tvYD — TV YouTube Downloader</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
 <style>
   :root {
     --bg: #000000;
@@ -33,12 +34,12 @@
   /* ---- header ---- */
   header { text-align: center; margin-bottom: 26px; }
   .brand { display: flex; align-items: center; justify-content: center; gap: 12px; }
-  .brand svg { width: 38px; height: 38px; filter: drop-shadow(0 4px 14px rgba(30,215,96,0.35)); }
+  .brand svg { width: 40px; height: 40px; filter: drop-shadow(0 4px 14px rgba(30,215,96,0.38)); }
   header h1 {
-    font-size: 27px; font-weight: 800; letter-spacing: -0.9px; color: #fff;
-    display: inline-block;
+    font-size: 30px; font-weight: 850; letter-spacing: -1.4px; color: #fff;
+    display: inline-block; line-height: 1;
   }
-  header h1 span { color: var(--green); }
+  header h1 span { color: var(--green); letter-spacing: -0.8px; }
   header p { color: var(--muted); font-size: 13.5px; margin-top: 10px; line-height: 1.5; }
   .chips { display: flex; gap: 8px; justify-content: center; margin-top: 18px; flex-wrap: wrap; align-items: center; }
   .chip {
@@ -210,13 +211,11 @@
 <div class="wrap">
   <header>
     <div class="brand">
-      <svg viewBox="0 0 32 32" aria-label="logo" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 32 32" aria-label="tvYD logo" xmlns="http://www.w3.org/2000/svg">
         <circle cx="16" cy="16" r="16" fill="#1ed760"/>
-        <path d="M7.2 11.6c6.4-1.9 14.2-1.3 19.2 1.6" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round"/>
-        <path d="M8.2 17.2c5.3-1.5 11.7-1 15.8 1.4" fill="none" stroke="#000" stroke-width="2.3" stroke-linecap="round"/>
-        <path d="M9.2 22.3c4.3-1.1 9.4-.8 12.8 1.1" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+        <path d="M7.5 8 L16 17 L24.5 8 M16 17 L16 25" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <h1>TV <span>YouTube</span> Downloader</h1>
+      <h1>tv<span>YD</span></h1>
       <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
     </div>
     <p>Download video YouTube → MP4 (H.264 + AAC) yang pasti bisa diputar di TV</p>

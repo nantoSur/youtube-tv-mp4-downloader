@@ -75,7 +75,8 @@ bin/yt-dlp.exe          diunduh oleh setup.bat (tidak masuk git)
 launch.vbs              launcher tersembunyi untuk aplikasi terinstall
 start.bat               launcher untuk development
 setup.bat               bootstrap alat saat pertama kali
-icon-round.ico          aset ikon aplikasi
+icon-round.ico          ikon aplikasi & shortcut (mark "Y")
+public/favicon.ico      favicon browser, identik dengan ikon aplikasi
 installer/setup.iss     skrip Inno Setup
 README.md / LICENSE
 ```
@@ -157,7 +158,8 @@ bin/yt-dlp.exe          downloaded by setup.bat (not committed)
 launch.vbs              hidden launcher used by the installed app
 start.bat               developer launcher
 setup.bat               first-run tool bootstrap
-icon-round.ico          app icon asset
+icon-round.ico          app/shortcut icon (letter "Y" mark)
+public/favicon.ico      browser favicon, identical to the app icon
 installer/setup.iss     Inno Setup script
 README.md / LICENSE
 ```

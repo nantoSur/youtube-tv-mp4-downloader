@@ -40,6 +40,7 @@ Source: "..\app.js"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\launch.vbs"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\icon-round.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\public\index.html"; DestDir: "{app}\public"; Flags: ignoreversion
+Source: "..\public\favicon.ico"; DestDir: "{app}\public"; Flags: ignoreversion
 Source: "..\bin\yt-dlp.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#NodeExe}"; DestDir: "{app}"; DestName: "node.exe"; Flags: ignoreversion
 
