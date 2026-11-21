@@ -50,7 +50,9 @@
   .chip b { color: #fff; font-weight: 700; }
   .chip.bad b { color: #ff6b6b; }
 
-  /* ---- equalizer ---- */
+  /* ---- language + equalizer ---- */
+  .ghost.lang { padding: 6px 12px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; }
+  .ghost.lang.active { background: var(--green); border-color: var(--green); color: #000; }
   .eq { display: inline-flex; align-items: flex-end; gap: 3px; height: 20px; margin-left: 2px; }
   .eq i {
     display: block; width: 3px; border-radius: 3px; background: var(--green);
@@ -218,8 +220,10 @@
       <h1>tv<span>YD</span></h1>
       <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
     </div>
-    <p>Download video YouTube → MP4 (H.264 + AAC) yang pasti bisa diputar di TV</p>
+    <p data-i18n="headerSub">Download video YouTube → MP4 (H.264 + AAC) yang pasti bisa diputar di TV</p>
     <div class="chips">
+      <button class="ghost lang active" data-lang="id" onclick="setLang('id')" title="Bahasa Indonesia">ID</button>
+      <button class="ghost lang" data-lang="en" onclick="setLang('en')" title="English">EN</button>
       <div class="chip" id="chipYtdlp">yt-dlp: <b>...</b></div>
       <div class="chip" id="chipFfmpeg">ffmpeg: <b>...</b></div>
       <div class="chip" id="chipVer" style="display:none">ver: <b>...</b></div>
@@ -228,27 +232,27 @@
   </header>
 
   <div class="card">
-    <label for="url">URL Video YouTube</label>
-    <input id="url" type="text" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" spellcheck="false">
+    <label for="url" data-i18n="lblUrl">URL Video YouTube</label>
+    <input id="url" type="text" data-i18n-placeholder="urlPlaceholder" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" spellcheck="false">
     <div class="row" style="margin-top:18px">
       <div>
-        <label for="quality">Kualitas</label>
+        <label for="quality" data-i18n="lblQuality">Kualitas</label>
         <select id="quality">
-          <option value="720" selected>720p HD (disarankan untuk TV)</option>
+          <option value="720" selected data-i18n="q720">720p HD (disarankan untuk TV)</option>
           <option value="1080">1080p Full HD</option>
           <option value="480">480p</option>
           <option value="360">360p</option>
-          <option value="best">Kualitas terbaik</option>
+          <option value="best" data-i18n="qBest">Kualitas terbaik</option>
         </select>
       </div>
       <div>
-        <label for="folder">Folder tujuan (kosongkan = Downloads)</label>
+        <label for="folder" data-i18n="lblFolder">Folder tujuan (kosongkan = Downloads)</label>
         <input id="folder" type="text" placeholder="C:\Users\...\Downloads" spellcheck="false">
       </div>
     </div>
     <div class="btns">
-      <button class="primary" id="btnStart" onclick="start()">Download MP4 untuk TV</button>
-      <button class="danger" id="btnAbort" style="display:none" onclick="abort()">Batalkan</button>
+      <button class="primary" id="btnStart" onclick="start()" data-i18n="btnDownload">Download MP4 untuk TV</button>
+      <button class="danger" id="btnAbort" style="display:none" onclick="abort()" data-i18n="btnCancel">Batalkan</button>
     </div>
     <div class="msg" id="msg"></div>
   </div>
@@ -256,7 +260,7 @@
   <div class="card" id="progressCard">
     <div class="phead">
       <div>
-        <div class="phase" id="phase">Menyiapkan...</div>
+        <div class="phase" id="phase" data-i18n="phaseInit">Menyiapkan...</div>
         <div class="subline"><span id="elapsed"></span><span id="meta"></span></div>
       </div>
       <div class="pct" id="pct">0%</div>
@@ -269,32 +273,159 @@
   </div>
 
   <div class="card" id="doneCard">
-    <div class="done-title"><span class="done-check">✓</span> Download selesai — file siap diputar di TV</div>
+    <div class="done-title"><span class="done-check">✓</span><span data-i18n="doneTitle">Download selesai — file siap diputar di TV</span></div>
     <div class="file-path" id="doneFile"></div>
     <div class="btns">
-      <button class="green" onclick="openFolder()">Buka lokasi file</button>
-      <button class="ghost" onclick="copyPath()">Salin path file</button>
+      <button class="green" onclick="openFolder()" data-i18n="btnOpen">Buka lokasi file</button>
+      <button class="ghost" onclick="copyPath()" data-i18n="btnCopy">Salin path file</button>
     </div>
   </div>
 
   <div class="foot">
-    <b>Cara pakai di TV:</b> salin file ke flashdisk → tancapkan ke TV → buka lewat pemutar file.<br>
-    Aplikasi ini otomatis merapikan struktur MP4 (progressive + faststart) dan memaksa codec H.264 + AAC,
-    sehingga file hasil download selalu kompatibel dengan TV.
+    <b data-i18n="footBold">Cara pakai di TV:</b><span data-i18n="footText"> salin file ke flashdisk → tancapkan ke TV → buka lewat pemutar file.</span><br>
+    <span data-i18n="footMore">Aplikasi ini otomatis merapikan struktur MP4 (progressive + faststart) dan memaksa codec H.264 + AAC, sehingga file hasil download selalu kompatibel dengan TV.</span>
   </div>
 </div>
 
 <script>
-let lastLogLen = 0;
+const I18N = {
+  id: {
+    headerSub: 'Download video YouTube → MP4 (H.264 + AAC) yang pasti bisa diputar di TV',
+    lblUrl: 'URL Video YouTube', urlPlaceholder: 'https://www.youtube.com/watch?v=...',
+    lblQuality: 'Kualitas', q720: '720p HD (disarankan untuk TV)', qBest: 'Kualitas terbaik',
+    lblFolder: 'Folder tujuan (kosongkan = Downloads)',
+    btnDownload: 'Download MP4 untuk TV', btnCancel: 'Batalkan',
+    phaseInit: 'Menyiapkan...',
+    doneTitle: 'Download selesai — file siap diputar di TV',
+    btnOpen: 'Buka lokasi file', btnCopy: 'Salin path file',
+    footBold: 'Cara pakai di TV:',
+    footText: ' salin file ke flashdisk → tancapkan ke TV → buka lewat pemutar file.',
+    footMore: 'Aplikasi ini otomatis merapikan struktur MP4 (progressive + faststart) dan memaksa codec H.264 + AAC, sehingga file hasil download selalu kompatibel dengan TV.',
+    none: 'tidak ada', btnUpdate: 'Update yt-dlp', msgUpdating: 'Mengupdate...',
+    msgPaste: 'Tempel URL YouTube dulu', msgUpdated: 'yt-dlp terupdate: ',
+    msgCopied: 'Path disalin ke clipboard', msgCopyFail: 'Gagal menyalin: ',
+    msgDone: 'Selesai!', msgCancelled: 'Dibatalkan',
+    elapsedRunning: 'berjalan ', etaPrefix: 'sisa ',
+    state_idle: 'idle', state_running: 'running', state_done: 'done', state_error: 'error',
+    dynamic: {}, prefixes: {}
+  },
+  en: {
+    headerSub: 'Download YouTube videos as MP4 (H.264 + AAC) that actually play on your TV',
+    lblUrl: 'YouTube video URL', urlPlaceholder: 'https://www.youtube.com/watch?v=...',
+    lblQuality: 'Quality', q720: '720p HD (recommended for TV)', qBest: 'Best quality',
+    lblFolder: 'Destination folder (blank = Downloads)',
+    btnDownload: 'Download MP4 for TV', btnCancel: 'Cancel',
+    phaseInit: 'Preparing...',
+    doneTitle: 'Download complete — the file is ready for your TV',
+    btnOpen: 'Open file location', btnCopy: 'Copy file path',
+    footBold: 'How to use on your TV:',
+    footText: ' copy the file to a flash drive → plug it into your TV → open it with the file player.',
+    footMore: 'The app automatically rewrites the MP4 into a progressive, faststart file and forces H.264 + AAC, so every download stays compatible with TVs.',
+    none: 'missing', btnUpdate: 'Update yt-dlp', msgUpdating: 'Updating...',
+    msgPaste: 'Paste a YouTube URL first', msgUpdated: 'yt-dlp updated: ',
+    msgCopied: 'Path copied to clipboard', msgCopyFail: 'Copy failed: ',
+    msgDone: 'Done!', msgCancelled: 'Cancelled',
+    elapsedRunning: 'running ', etaPrefix: 'left ',
+    state_idle: 'Idle', state_running: 'Running', state_done: 'Done', state_error: 'Error',
+    dynamic: {
+      'Menyiapkan...': 'Preparing...',
+      'Menyiapkan download': 'Preparing download',
+      'Memeriksa file hasil download': 'Verifying downloaded file',
+      'Merapikan MP4 untuk TV': 'Remuxing MP4 for TV',
+      'Transcoding ke H.264 + AAC untuk TV': 'Transcoding to H.264 + AAC for TV',
+      'Selesai': 'Done',
+      'Mengunduh audio': 'Downloading audio',
+      'Mengunduh video': 'Downloading video',
+      'Menggabungkan stream': 'Merging streams',
+      'Dibatalkan': 'Cancelled',
+      'File hasil download tidak ditemukan': 'Downloaded file not found',
+      'Masih ada proses download yang berjalan': 'A download is already running',
+      'URL tidak valid': 'Invalid URL',
+      'Bukan URL YouTube': 'Not a YouTube URL',
+      'Folder tujuan harus path absolut': 'Destination folder must be an absolute path',
+      'yt-dlp.exe tidak ada di folder bin': 'yt-dlp.exe is missing from the bin folder',
+      'ffmpeg tidak ditemukan. Klik "Install ffmpeg" dulu.': 'ffmpeg not found. Click "Install ffmpeg" first.',
+      'Tunggu proses download selesai': 'Wait for the download to finish',
+      'yt-dlp.exe tidak ada, muat ulang aplikasi': 'yt-dlp.exe is missing, reload the app',
+      'File tidak ditemukan': 'File not found',
+      'Body tidak valid': 'Invalid request body',
+      'Tidak ada proses yang berjalan': 'No process is running',
+      'Gagal: file hasil download tidak ditemukan.': 'Failed: downloaded file not found.',
+      'Selesai! File siap diputar di TV.': 'Done! The file is ready for your TV.',
+      'Download dibatalkan.': 'Download cancelled.',
+      'Mengupdate yt-dlp...': 'Updating yt-dlp...',
+      'Codec sudah sesuai TV — merapikan struktur file tanpa re-encode...': 'Codecs are TV-safe — remuxing without re-encode...',
+      'Codec tidak aman untuk TV — dikonversi ke H.264 + AAC, tunggu sebentar...': 'Codecs are not TV-safe — converting to H.264 + AAC, please wait...'
+    },
+    prefixes: {
+      'Folder tidak bisa dibuat: ': 'Could not create folder: ',
+      'Gagal menjalankan yt-dlp: ': 'Failed to start yt-dlp: ',
+      'Update gagal: ': 'Update failed: ',
+      'Gagal memproses file: ': 'Failed to process file: ',
+      'Codec terdeteksi: ': 'Codecs detected: ',
+      'yt-dlp terupdate ke versi ': 'yt-dlp updated to version ',
+      'Kualitas: ': 'Quality: ',
+      'Download gagal (exit ': 'Download failed (exit ',
+      '. Cek URL dan koneksi internet.': '. Check the URL and your internet connection.'
+    }
+  }
+};
+
+let lang = 'id';
+let lastStatus = null;
+let lastTools = null;
+let lastLogRaw = null;
+let msgInfo = null;
+let updating = false;
 let pollTimer = null;
 let currentFile = '';
 
 function $(id) { return document.getElementById(id); }
+function T(key) { return I18N[lang][key] !== undefined ? I18N[lang][key] : key; }
+function TR(text) {
+  if (text === null || text === undefined) return text;
+  const s = String(text);
+  if (I18N[lang].dynamic[s] !== undefined) return I18N[lang].dynamic[s];
+  for (const k in I18N[lang].prefixes) {
+    if (s.indexOf(k) === 0) return I18N[lang].prefixes[k] + s.slice(k.length);
+  }
+  return s;
+}
 
-function setMsg(text, cls) {
+function setLang(next) {
+  lang = (next === 'en') ? 'en' : 'id';
+  try { localStorage.setItem('tvyd-lang', lang); } catch (e) {}
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = T(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => { el.placeholder = T(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('.ghost.lang').forEach((b) => { b.classList.toggle('active', b.dataset.lang === lang); });
+  $('btnUpdate').textContent = updating ? T('msgUpdating') : T('btnUpdate');
+  paintMsg();
+  if (lastTools) paintTools(lastTools);
+  if (lastStatus) { lastLogRaw = null; paintStatus(lastStatus); }
+}
+
+function paintMsg() {
   const el = $('msg');
-  el.textContent = text || '';
-  el.className = 'msg' + (cls ? ' ' + cls : '');
+  if (!msgInfo) { el.textContent = ''; el.className = 'msg'; return; }
+  const text = msgInfo.key ? T(msgInfo.key) + (msgInfo.raw || '') : TR(msgInfo.raw || '');
+  el.textContent = text;
+  el.className = 'msg' + (msgInfo.cls ? ' ' + msgInfo.cls : '');
+}
+function setMsg(text, cls, key) {
+  msgInfo = { raw: text || '', cls: cls || '', key: key || null };
+  paintMsg();
+}
+
+function paintTools(data) {
+  lastTools = data;
+  const c1 = $('chipYtdlp'), c2 = $('chipFfmpeg'), c3 = $('chipVer');
+  c1.innerHTML = 'yt-dlp: <b>' + (data.ytdlp || T('none')) + '</b>';
+  c1.className = 'chip' + (data.ytdlp ? '' : ' bad');
+  c2.innerHTML = 'ffmpeg: <b>' + (data.ffmpeg ? 'OK' : T('none')) + '</b>';
+  c2.className = 'chip' + (data.ffmpeg ? '' : ' bad');
+  if (data.ytdlp) { c3.style.display = ''; c3.innerHTML = 'ver: <b>' + data.ytdlp + '</b>'; }
+  if (!$('folder').value) $('folder').placeholder = data.defaultFolder;
 }
 
 async function api(path, method, body) {
@@ -307,21 +438,12 @@ async function api(path, method, body) {
 }
 
 async function loadTools() {
-  try {
-    const t = await api('/api/tools');
-    const c1 = $('chipYtdlp'), c2 = $('chipFfmpeg'), c3 = $('chipVer');
-    c1.innerHTML = 'yt-dlp: <b>' + (t.ytdlp || 'tidak ada') + '</b>';
-    c1.className = 'chip' + (t.ytdlp ? '' : ' bad');
-    c2.innerHTML = 'ffmpeg: <b>' + (t.ffmpeg ? 'OK' : 'tidak ada') + '</b>';
-    c2.className = 'chip' + (t.ffmpeg ? '' : ' bad');
-    if (t.ytdlp) { c3.style.display = ''; c3.innerHTML = 'ver: <b>' + t.ytdlp + '</b>'; }
-    if (!$('folder').value) $('folder').placeholder = t.defaultFolder;
-  } catch (e) {}
+  try { paintTools(await api('/api/tools')); } catch (e) {}
 }
 
 async function start() {
   const url = $('url').value.trim();
-  if (!url) return setMsg('Tempel URL YouTube dulu', 'err');
+  if (!url) return setMsg('', 'err', 'msgPaste');
   setMsg('');
   $('btnStart').disabled = true;
   try {
@@ -332,8 +454,9 @@ async function start() {
     });
     $('doneCard').style.display = 'none';
     $('progressCard').style.display = 'block';
-    $('log').innerHTML = '';
-    lastLogLen = 0;
+    $('log').textContent = '';
+    lastLogRaw = null;
+    lastStatus = null;
     poll();
   } catch (e) {
     setMsg(e.message, 'err');
@@ -347,17 +470,19 @@ async function abort() {
 
 async function updateYtdlp() {
   const btn = $('btnUpdate');
+  updating = true;
   btn.disabled = true;
-  btn.textContent = 'Mengupdate...';
+  btn.textContent = T('msgUpdating');
   try {
     const r = await api('/api/update', 'POST');
-    setMsg('yt-dlp terupdate: ' + r.version, 'ok');
+    setMsg(r.version, 'ok', 'msgUpdated');
     loadTools();
   } catch (e) {
     setMsg(e.message, 'err');
   }
+  updating = false;
   btn.disabled = false;
-  btn.textContent = 'Update yt-dlp';
+  btn.textContent = T('btnUpdate');
 }
 
 async function openFolder() {
@@ -369,9 +494,9 @@ async function copyPath() {
   if (!currentFile) return;
   try {
     await navigator.clipboard.writeText(currentFile);
-    setMsg('Path disalin ke clipboard', 'ok');
+    setMsg('', 'ok', 'msgCopied');
   } catch (e) {
-    setMsg('Gagal menyalin: ' + e.message, 'err');
+    setMsg(e.message, 'err', 'msgCopyFail');
   }
 }
 
@@ -381,18 +506,10 @@ function fmtElapsed(ms) {
   return m + 'm ' + String(s % 60).padStart(2, '0') + 's';
 }
 
-async function poll() {
-  clearTimeout(pollTimer);
-  let s;
-  try {
-    s = await api('/api/status');
-  } catch (e) {
-    pollTimer = setTimeout(poll, 1500);
-    return;
-  }
-
+function paintStatus(s) {
+  lastStatus = s;
   $('progressCard').style.display = 'block';
-  $('phase').textContent = s.phase || s.state;
+  $('phase').textContent = TR(s.phase || T('state_' + s.state));
 
   const pctText = s.percent + '%';
   const pctEl = $('pct');
@@ -407,24 +524,39 @@ async function poll() {
 
   const meta = [];
   if (s.speed) meta.push(s.speed);
-  if (s.eta) meta.push('sisa ' + s.eta);
+  if (s.eta) meta.push(T('etaPrefix') + s.eta);
   $('meta').textContent = meta.join('  ·  ');
 
   $('bar').classList.toggle('donePulse', s.state === 'done');
 
   if (s.startedAt && s.state === 'running') {
-    $('elapsed').textContent = 'berjalan ' + fmtElapsed(Date.now() - s.startedAt);
+    $('elapsed').textContent = T('elapsedRunning') + fmtElapsed(Date.now() - s.startedAt);
   } else if (s.state === 'done') {
     $('elapsed').textContent = '';
   }
 
-  if (s.log.length !== lastLogLen) {
+  const lines = s.log || [];
+  const raw = lines.join('\n');
+  if (raw !== lastLogRaw) {
     const logEl = $('log');
     const atBottom = logEl.scrollTop + logEl.clientHeight >= logEl.scrollHeight - 40;
-    logEl.textContent = s.log.join('\n');
-    lastLogLen = s.log.length;
+    logEl.textContent = lines.map(TR).join('\n');
+    lastLogRaw = raw;
     if (atBottom) logEl.scrollTop = logEl.scrollHeight;
   }
+}
+
+async function poll() {
+  clearTimeout(pollTimer);
+  let s;
+  try {
+    s = await api('/api/status');
+  } catch (e) {
+    pollTimer = setTimeout(poll, 1500);
+    return;
+  }
+
+  paintStatus(s);
 
   if (s.state === 'running') {
     $('btnStart').disabled = true;
@@ -437,12 +569,12 @@ async function poll() {
       currentFile = s.file;
       $('doneFile').textContent = s.file;
       $('doneCard').style.display = 'block';
-      setMsg('Selesai!', 'ok');
+      setMsg('', 'ok', 'msgDone');
       loadTools();
       pollTimer = setTimeout(poll, 4000);
     } else if (s.state === 'error') {
       if (s.error && s.error !== 'Dibatalkan') setMsg(s.error, 'err');
-      else if (s.error === 'Dibatalkan') setMsg('Dibatalkan', '');
+      else if (s.error === 'Dibatalkan') setMsg('', '', 'msgCancelled');
       pollTimer = setTimeout(poll, 4000);
     } else {
       pollTimer = setTimeout(poll, 4000);
@@ -450,8 +582,9 @@ async function poll() {
   }
 }
 
-$('url').addEventListener('keydown', (e) => { if (e.key === 'Enter') start(); });
-
+let saved = 'id';
+try { saved = localStorage.getItem('tvyd-lang') || 'id'; } catch (e) {}
+setLang(saved);
 loadTools();
 poll();
 </script>
