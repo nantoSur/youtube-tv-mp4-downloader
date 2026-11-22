@@ -72,7 +72,7 @@ Installer memasang aplikasi ke `%LOCALAPPDATA%\TV YouTube Downloader`, membuat s
 
 ```
 app.js                  server HTTP lokal + pipeline download/cek/remux
-public/index.html       UI web bertema pink (tanpa framework)
+public/index.html       UI web bilingual bertema gelap (tanpa framework)
 bin/yt-dlp.exe          diunduh oleh setup.bat (tidak masuk git)
 launch.vbs              launcher tersembunyi untuk aplikasi terinstall
 start.bat               launcher untuk development
@@ -80,12 +80,16 @@ setup.bat               bootstrap alat saat pertama kali
 icon-round.ico          ikon aplikasi & shortcut (mark "Y")
 public/favicon.ico      favicon browser, identik dengan ikon aplikasi
 installer/setup.iss     skrip Inno Setup
-README.md / LICENSE
+README.md / LICENSE / THIRD_PARTY_NOTICES.md
 ```
 
 ### Catatan
 
 `yt-dlp.exe` dan installer yang sudah dikompilasi sengaja tidak dimasukkan ke git (`.gitignore`); `setup.bat` akan mengunduhnya lagi saat clone bersih. FFmpeg dicari dari `PATH`, lokasi instalasi winget, atau folder `bin/`.
+
+### Penafian
+
+Aplikasi ini hanya untuk mengunduh konten yang Anda miliki atau memiliki izin untuk mengunduhnya. Patuhi Syarat Layanan platform sumber video dan peraturan hak cipta yang berlaku. Penulis tidak bertanggung jawab atas penyalahgunaan atau pelanggaran oleh pengguna. Rincian lisensi pihak ketiga ada di `THIRD_PARTY_NOTICES.md`.
 
 ---
 
@@ -157,7 +161,7 @@ The installer installs to `%LOCALAPPDATA%\TV YouTube Downloader`, creates deskto
 
 ```
 app.js                  local HTTP server + download/verify/remux pipeline
-public/index.html       pink-themed web UI (no frameworks)
+public/index.html       dark-themed bilingual web UI (no frameworks)
 bin/yt-dlp.exe          downloaded by setup.bat (not committed)
 launch.vbs              hidden launcher used by the installed app
 start.bat               developer launcher
@@ -165,9 +169,13 @@ setup.bat               first-run tool bootstrap
 icon-round.ico          app/shortcut icon (letter "Y" mark)
 public/favicon.ico      browser favicon, identical to the app icon
 installer/setup.iss     Inno Setup script
-README.md / LICENSE
+README.md / LICENSE / THIRD_PARTY_NOTICES.md
 ```
 
 ### Notes
 
 `yt-dlp.exe` and the compiled installer are intentionally excluded from git (`.gitignore`); `setup.bat` recreates the tool on a fresh clone. FFmpeg is detected from `PATH`, winget install locations, or the `bin/` folder.
+
+### Disclaimer
+
+This app is only for downloading content you own or have permission to download. Comply with the source platform's Terms of Service and applicable copyright laws. The author is not responsible for misuse or violations by users. Third-party license details are in `THIRD_PARTY_NOTICES.md`.
