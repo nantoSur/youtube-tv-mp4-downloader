@@ -4,7 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { spawn, exec, execFile, execSync } = require('child_process');
+const { spawn, exec, execFile, execSync, execFileSync } = require('child_process');
 
 const ROOT = __dirname;
 const BIN = path.join(ROOT, 'bin');
@@ -583,15 +583,33 @@ function openBrowser(port) {
   exec('start "" "http://127.0.0.1:' + port + '"', { windowsHide: true }, () => {});
 }
 
-function probeExisting(port) {
+function probePath(port, urlPath) {
   return new Promise((resolve) => {
-    const req = http.get({ host: '127.0.0.1', port, path: '/api/tools', timeout: 800 }, (res) => {
+    const req = http.get({ host: '127.0.0.1', port, path: urlPath, timeout: 800 }, (res) => {
       res.resume();
       resolve(res.statusCode === 200);
     });
     req.on('error', () => resolve(false));
     req.on('timeout', () => { req.destroy(); resolve(false); });
   });
+}
+
+async function probeExisting(port) {
+  // Server lama bisa saja masih hidup dengan file UI yang sudah terhapus (404).
+  if (!await probePath(port, '/api/tools')) return false;
+  return await probePath(port, '/');
+}
+
+function killStaleInstances() {
+  // Matikan instance aplikasi ini dari folder instalasi lain, kecuali diri sendiri.
+  const script = "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | " +
+    "Where-Object { $_.CommandLine -like '*TV YouTube Downloader\\app.js*' -and $_.ProcessId -ne " + process.pid + " } | " +
+    'ForEach-Object { Stop-Process -Id $_.ProcessId -Force }';
+  try {
+    execFileSync('powershell.exe', ['-NoProfile', '-Command', script], {
+      windowsHide: true, stdio: 'ignore', timeout: 10000,
+    });
+  } catch (e) {}
 }
 
 async function main() {
@@ -602,6 +620,8 @@ async function main() {
     return;
   }
 
+  killStaleInstances();
+  await new Promise((r) => setTimeout(r, 800));
   detectTools();
 
   let port = BASE_PORT;

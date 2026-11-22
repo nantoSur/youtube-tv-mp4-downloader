@@ -88,6 +88,8 @@ README.md / LICENSE / THIRD_PARTY_NOTICES.md
 
 `yt-dlp.exe` dan installer yang sudah dikompilasi sengaja tidak dimasukkan ke git (`.gitignore`); `setup.bat` akan mengunduhnya lagi saat clone bersih. FFmpeg dicari dari `PATH`, lokasi instalasi winget, atau folder `bin/`.
 
+Jika aplikasi dipindah/install ke folder lain, instance lama yang masih berjalan akan terdeteksi (halaman utama tidak merespons) dan dimatikan otomatis saat aplikasi dibuka, sehingga port 7777 selalu dipakai oleh instalasi aktif.
+
 ### Penafian
 
 Aplikasi ini hanya untuk mengunduh konten yang Anda miliki atau memiliki izin untuk mengunduhnya. Patuhi Syarat Layanan platform sumber video dan peraturan hak cipta yang berlaku. Penulis tidak bertanggung jawab atas penyalahgunaan atau pelanggaran oleh pengguna. Rincian lisensi pihak ketiga ada di `THIRD_PARTY_NOTICES.md`.
@@ -177,6 +179,8 @@ README.md / LICENSE / THIRD_PARTY_NOTICES.md
 ### Notes
 
 `yt-dlp.exe` and the compiled installer are intentionally excluded from git (`.gitignore`); `setup.bat` recreates the tool on a fresh clone. FFmpeg is detected from `PATH`, winget install locations, or the `bin/` folder.
+
+If the app is moved or reinstalled to another folder, a stale running instance (whose main page no longer responds) is detected and terminated automatically on startup, so port 7777 is always used by the active installation.
 
 ### Disclaimer
 
