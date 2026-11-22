@@ -457,7 +457,13 @@ async function searchYouTube(query) {
 
 function openExplorer(target) {
   if (!target || !fs.existsSync(target)) return { error: 'File tidak ditemukan' };
-  spawn('explorer.exe', ['/select,' + target], { detached: true, windowsHide: true }).unref();
+  const safe = String(target).replace(/"/g, '');
+  const child = spawn('explorer.exe', ['/select,"' + safe + '"'], {
+    detached: true,
+    windowsVerbatimArguments: true,
+  });
+  child.on('error', () => {});
+  child.unref();
   return { ok: true };
 }
 
