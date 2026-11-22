@@ -40,6 +40,7 @@ The Unlicense explicitly permits use, modification and distribution for commerci
 - **Lisensi / License:** freeware; penggunaan komersial diperbolehkan tanpa biaya
 - **Sumber / Source:** https://jrsoftware.org/isinfo.php
 - **Pemakaian / Use:** compiler untuk membuat file installer `.exe`.
+- `installer/Indonesian.isl` berasal dari repositori resmi Inno Setup (`Files/Languages/Unofficial/Indonesian.isl`), terjemahan oleh MozaikTM dan diperbarui Edward Tie. Digunakan untuk pilihan bahasa Indonesia di wizard installer.
 
 ---
 

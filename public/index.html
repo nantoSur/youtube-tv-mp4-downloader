@@ -305,8 +305,8 @@
         </select>
       </div>
       <div>
-        <label for="folder" data-i18n="lblFolder">Folder tujuan (kosongkan = Downloads)</label>
-        <input id="folder" type="text" placeholder="C:\Users\...\Downloads" spellcheck="false">
+        <label for="folder" data-i18n="lblFolder">Folder tujuan (kosongkan = folder hasil instalasi)</label>
+        <input id="folder" type="text" placeholder="Folder hasil instalasi" spellcheck="false">
       </div>
     </div>
     <div class="btns">
@@ -352,7 +352,7 @@ const I18N = {
     headerSub: 'Download video YouTube → MP4 (H.264 + AAC) yang pasti bisa diputar di TV',
     lblUrl: 'URL Video YouTube', urlPlaceholder: 'https://www.youtube.com/watch?v=...',
     lblQuality: 'Kualitas', q2160: '2160p 4K Ultra HD (file besar)', q720: '720p HD (disarankan untuk TV)', qBest: 'Kualitas terbaik',
-    lblFolder: 'Folder tujuan (kosongkan = Downloads)',
+    lblFolder: 'Folder tujuan (kosongkan = folder hasil instalasi)',
     btnDownload: 'Download MP4 untuk TV', btnCancel: 'Batalkan',
     phaseInit: 'Menyiapkan...',
     doneTitle: 'Download selesai — file siap diputar di TV',
@@ -378,7 +378,7 @@ const I18N = {
     headerSub: 'Download YouTube videos as MP4 (H.264 + AAC) that actually play on your TV',
     lblUrl: 'YouTube video URL', urlPlaceholder: 'https://www.youtube.com/watch?v=...',
     lblQuality: 'Quality', q2160: '2160p 4K Ultra HD (large file)', q720: '720p HD (recommended for TV)', qBest: 'Best quality',
-    lblFolder: 'Destination folder (blank = Downloads)',
+    lblFolder: 'Destination folder (blank = folder chosen at install)',
     btnDownload: 'Download MP4 for TV', btnCancel: 'Cancel',
     phaseInit: 'Preparing...',
     doneTitle: 'Download complete — the file is ready for your TV',
@@ -519,7 +519,7 @@ function paintTools(data) {
   c2.innerHTML = 'ffmpeg: <b>' + (data.ffmpeg ? 'OK' : T('none')) + '</b>';
   c2.className = 'chip' + (data.ffmpeg ? '' : ' bad');
   if (data.ytdlp) { c3.style.display = ''; c3.innerHTML = 'ver: <b>' + data.ytdlp + '</b>'; }
-  if (!$('folder').value) $('folder').placeholder = data.defaultFolder;
+  if (!$('folder').value) $('folder').value = data.defaultFolder;
 }
 
 async function api(path, method, body) {

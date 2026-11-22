@@ -81,6 +81,14 @@ function detectTools() {
 }
 
 function defaultFolder() {
+  // Folder dipilih saat instalasi pertama dan disimpan oleh installer.
+  try {
+    const cfg = path.join(ROOT, 'download-folder.txt');
+    if (fs.existsSync(cfg)) {
+      const saved = fs.readFileSync(cfg, 'utf8').replace(/^\uFEFF/, '').trim();
+      if (saved && path.isAbsolute(saved)) return saved;
+    }
+  } catch (e) {}
   return path.join(os.homedir(), 'Downloads');
 }
 

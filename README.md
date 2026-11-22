@@ -66,7 +66,7 @@ Script otomatis mencari `node.exe` di `%ProgramFiles%\nodejs` maupun `%ProgramW6
 ISCC.exe /dNodeExe="D:\path\node.exe" installer\setup.iss
 ```
 
-Installer memasang aplikasi ke `%LOCALAPPDATA%\TV YouTube Downloader`, membuat shortcut Desktop dan Start Menu, serta mendaftarkan uninstaller.
+Installer memasang aplikasi ke `%LOCALAPPDATA%\TV YouTube Downloader`, membuat shortcut Desktop dan Start Menu, serta mendaftarkan uninstaller. Urutan wizard: pilih bahasa (Indonesia/English) → pilih lokasi instalasi aplikasi → pilih **folder tujuan penyimpanan file download** → Install → Selesai. Folder download yang dipilih disimpan di `download-folder.txt` di folder instalasi dan dipakai sebagai nilai awal kolom "Folder tujuan"; tombol **Buka lokasi file** akan membuka file di folder tersebut.
 
 ### Struktur proyek
 
@@ -80,6 +80,7 @@ setup.bat               bootstrap alat saat pertama kali
 icon-round.ico          ikon aplikasi & shortcut (mark "Y")
 public/favicon.ico      favicon browser, identik dengan ikon aplikasi
 installer/setup.iss     skrip Inno Setup
+installer/Indonesian.isl  terjemahan wizard ( unofficial, dari repo Inno Setup )
 README.md / LICENSE / THIRD_PARTY_NOTICES.md
 ```
 
@@ -155,7 +156,7 @@ The script looks for `node.exe` in both `%ProgramFiles%\nodejs` and `%ProgramW64
 ISCC.exe /dNodeExe="D:\path\node.exe" installer\setup.iss
 ```
 
-The installer installs to `%LOCALAPPDATA%\TV YouTube Downloader`, creates desktop and Start Menu shortcuts, and registers an uninstaller.
+The installer installs to `%LOCALAPPDATA%\TV YouTube Downloader`, creates desktop and Start Menu shortcuts, and registers an uninstaller. Wizard order: choose language (Indonesian/English) → choose the app install location → choose the **folder where downloads will be saved** → Install → Finish. The chosen download folder is stored in `download-folder.txt` inside the install folder and becomes the initial value of the "Destination folder" field, so **Open file location** reveals the downloaded file there.
 
 ### Project structure
 
@@ -169,6 +170,7 @@ setup.bat               first-run tool bootstrap
 icon-round.ico          app/shortcut icon (letter "Y" mark)
 public/favicon.ico      browser favicon, identical to the app icon
 installer/setup.iss     Inno Setup script
+installer/Indonesian.isl  wizard translation (unofficial, from Inno Setup repo)
 README.md / LICENSE / THIRD_PARTY_NOTICES.md
 ```
 
