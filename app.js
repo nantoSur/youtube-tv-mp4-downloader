@@ -4,7 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { spawn, exec, execSync } = require('child_process');
+const { spawn, exec, execFile, execSync } = require('child_process');
 
 const ROOT = __dirname;
 const BIN = path.join(ROOT, 'bin');
@@ -411,6 +411,50 @@ async function updateYtdlp() {
   }
 }
 
+async function searchYouTube(query) {
+  if (!fs.existsSync(YTDLP)) return { error: 'yt-dlp.exe tidak ada di folder bin' };
+  const q = String(query || '').trim().replace(/\s+/g, ' ').slice(0, 200);
+  if (!q) return { error: 'Query pencarian kosong' };
+  const count = 8;
+  const args = [
+    '--dump-json', '--flat-playlist', '--playlist-end', String(count),
+    '--no-warnings', '--no-call-home', 'ytsearch' + count + ':' + q,
+  ];
+  try {
+    const out = await new Promise((resolve, reject) => {
+      execFile(YTDLP, args, {
+        timeout: 45000, maxBuffer: 12 * 1024 * 1024, encoding: 'utf8', windowsHide: true,
+      }, (err, stdout, stderr) => {
+        if (err) return reject(new Error(stderr || err.message));
+        resolve(stdout);
+      });
+    });
+    const results = [];
+    for (const line of out.split(/\r?\n/)) {
+      const t = line.trim();
+      if (!t.startsWith('{')) continue;
+      try {
+        const d = JSON.parse(t);
+        const id = d.id;
+        if (!id || !/^[A-Za-z0-9_-]{11}$/.test(id) || !d.title) continue;
+        results.push({
+          id: id,
+          title: d.title,
+          channel: d.channel || d.uploader || '',
+          duration: d.duration || null,
+          url: d.webpage_url || ('https://www.youtube.com/watch?v=' + id),
+          thumb: 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg',
+        });
+      } catch (_) {}
+      if (results.length >= count) break;
+    }
+    return { results: results };
+  } catch (e) {
+    const msg = String(e.message || e).split(/\r?\n/).map((s) => s.trim()).filter(Boolean).slice(-2).join(' | ');
+    return { error: 'Pencarian gagal: ' + msg };
+  }
+}
+
 function openExplorer(target) {
   if (!target || !fs.existsSync(target)) return { error: 'File tidak ditemukan' };
   spawn('explorer.exe', ['/select,' + target], { detached: true, windowsHide: true }).unref();
@@ -479,6 +523,13 @@ const server = http.createServer(async (req, res) => {
         ffprobe: !!ffprobePath,
         defaultFolder: defaultFolder(),
       });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/search') {
+      const body = await readBody(req);
+      if (!body) return send(400, { error: 'Body tidak valid' });
+      const r = await searchYouTube(body.q);
+      return send(r.error ? 400 : 200, r);
     }
 
     if (req.method === 'POST' && req.url === '/api/download') {

@@ -17,6 +17,7 @@ File yang kelihatannya valid di komputer bisa saja ditolak TV dengan pesan "unsu
 ### Fitur
 
 - UI web lokal yang otomatis terbuka di browser
+- Pencarian video YouTube di dalam aplikasi (memakai yt-dlp, tanpa API key) dengan preview embed — klik hasil untuk mengisi URL lalu download
 - Sakelar bahasa **Indonesia / English** (pilihan tersimpan di browser); termasuk terjemahan progress, error, dan log
 - Pilihan kualitas: 360p / 480p / 720p / 1080p / **2160p 4K** / terbaik
 - Memilih stream `avc1` (H.264) + `mp4a` (AAC) — pasangan codec yang dipahami TV
@@ -101,6 +102,7 @@ A file that looks perfectly fine on a PC can still be rejected by a TV with an "
 ### Features
 
 - Simple local web UI that opens automatically in the browser
+- Built-in YouTube search (powered by yt-dlp, no API key) with embedded preview — click a result to fill the URL and download
 - **Indonesian / English** language switch (remembered in your browser), including progress, errors and log lines
 - Quality presets: 360p / 480p / 720p / 1080p / **2160p 4K** / best
 - Prefers `avc1` (H.264) + `mp4a` (AAC) streams — the codec pair TVs understand

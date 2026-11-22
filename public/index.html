@@ -78,6 +78,43 @@
     margin-bottom: 16px;
     box-shadow: 0 16px 42px rgba(0,0,0,0.55);
   }
+  /* ---- search + player ---- */
+  .search-msg { font-size: 12.5px; min-height: 18px; margin-top: 10px; color: var(--muted); }
+  .search-msg.err { color: #ff6b6b; }
+  .search-msg.ok { color: var(--green); }
+  .result-list { display: grid; gap: 10px; margin-top: 6px; }
+  .result {
+    display: flex; gap: 12px; padding: 10px; border-radius: 12px; cursor: pointer;
+    background: rgba(255,255,255,0.035); border: 1px solid transparent;
+    transition: background .15s, border-color .15s, transform .12s;
+  }
+  .result:hover { background: rgba(255,255,255,0.075); border-color: rgba(30,215,96,0.4); transform: translateX(2px); }
+  .result.selected { border-color: var(--green); background: rgba(30,215,96,0.10); }
+  .result img {
+    width: 128px; height: 72px; object-fit: cover; border-radius: 8px;
+    flex: 0 0 auto; background: #000;
+  }
+  .rinfo { min-width: 0; flex: 1; }
+  .rtitle {
+    font-size: 13.5px; font-weight: 700; line-height: 1.35; color: #fff;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .rmeta { font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+  .ractions { display: flex; gap: 8px; margin-top: 9px; }
+  .ractions button { padding: 7px 13px; font-size: 11.5px; }
+  .player-box {
+    margin-top: 16px; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--line); background: #000;
+  }
+  .player-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 8px 12px; font-size: 12px; color: var(--muted); background: #161616;
+  }
+  .player-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .player-head button { padding: 5px 12px; font-size: 11.5px; flex: 0 0 auto; }
+  .player-frame { position: relative; width: 100%; padding-top: 56.25%; }
+  .player-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
   label {
     display: block; font-size: 11px; color: var(--muted); margin-bottom: 9px;
     font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
@@ -239,6 +276,20 @@
   </header>
 
   <div class="card">
+    <label for="searchInput" data-i18n="lblSearch">Cari video YouTube</label>
+    <div class="btns">
+      <input id="searchInput" type="text" data-i18n-placeholder="searchPlaceholder" placeholder="Judul video, channel, atau kata kunci..." autocomplete="off" spellcheck="false" style="flex:1">
+      <button class="primary" id="btnSearch" style="flex:0 0 auto" onclick="searchVideos()" data-i18n="btnSearch">Cari</button>
+    </div>
+    <div class="search-msg" id="searchMsg"></div>
+    <div class="result-list" id="searchResults"></div>
+    <div class="player-box" id="playerBox" hidden>
+      <div class="player-head"><span id="playerTitle"></span><button class="ghost" onclick="closePlayer()" data-i18n="btnClose">Tutup</button></div>
+      <div class="player-frame"><iframe id="playerFrame" title="YouTube player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+    </div>
+  </div>
+
+  <div class="card">
     <label for="url" data-i18n="lblUrl">URL Video YouTube</label>
     <input id="url" type="text" data-i18n-placeholder="urlPlaceholder" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" spellcheck="false">
     <div class="row" style="margin-top:18px">
@@ -309,6 +360,12 @@ const I18N = {
     footBold: 'Cara pakai di TV:',
     footText: ' salin file ke flashdisk → tancapkan ke TV → buka lewat pemutar file.',
     footMore: 'Aplikasi ini otomatis merapikan struktur MP4 (progressive + faststart) dan memaksa codec H.264 + AAC, sehingga file hasil download selalu kompatibel dengan TV.',
+    lblSearch: 'Cari video YouTube', searchPlaceholder: 'Judul video, channel, atau kata kunci...',
+    btnSearch: 'Cari', searching: 'Mencari video...', noResults: 'Tidak ada hasil. Coba kata kunci lain.',
+    searchFail: 'Gagal mencari: ', searchEmpty: 'Ketik kata kunci dulu',
+    resultPlay: 'Putar', resultPick: 'Pilih & isi URL', btnClose: 'Tutup',
+    playerTitle: 'Memutar: ', urlFilled: 'URL terisi. Pilih kualitas lalu klik Download.',
+    durationUnknown: 'Durasi ?',
     none: 'tidak ada', btnUpdate: 'Update yt-dlp', msgUpdating: 'Mengupdate...',
     msgPaste: 'Tempel URL YouTube dulu', msgUpdated: 'yt-dlp terupdate: ',
     msgCopied: 'Path disalin ke clipboard', msgCopyFail: 'Gagal menyalin: ',
@@ -329,6 +386,12 @@ const I18N = {
     footBold: 'How to use on your TV:',
     footText: ' copy the file to a flash drive → plug it into your TV → open it with the file player.',
     footMore: 'The app automatically rewrites the MP4 into a progressive, faststart file and forces H.264 + AAC, so every download stays compatible with TVs.',
+    lblSearch: 'Search YouTube', searchPlaceholder: 'Video title, channel, or keyword...',
+    btnSearch: 'Search', searching: 'Searching videos...', noResults: 'No results. Try another keyword.',
+    searchFail: 'Search failed: ', searchEmpty: 'Type a keyword first',
+    resultPlay: 'Play', resultPick: 'Pick & fill URL', btnClose: 'Close',
+    playerTitle: 'Playing: ', urlFilled: 'URL filled. Choose a quality and click Download.',
+    durationUnknown: 'Duration ?',
     none: 'missing', btnUpdate: 'Update yt-dlp', msgUpdating: 'Updating...',
     msgPaste: 'Paste a YouTube URL first', msgUpdated: 'yt-dlp updated: ',
     msgCopied: 'Path copied to clipboard', msgCopyFail: 'Copy failed: ',
@@ -362,6 +425,7 @@ const I18N = {
       'Selesai! File siap diputar di TV.': 'Done! The file is ready for your TV.',
       'Download dibatalkan.': 'Download cancelled.',
       'Mengupdate yt-dlp...': 'Updating yt-dlp...',
+      'Query pencarian kosong': 'Enter a search keyword first',
       'Codec sudah sesuai TV — merapikan struktur file tanpa re-encode...': 'Codecs are TV-safe — remuxing without re-encode...',
       'Codec tidak aman untuk TV — dikonversi ke H.264 + AAC, tunggu sebentar...': 'Codecs are not TV-safe — converting to H.264 + AAC, please wait...'
     },
@@ -369,6 +433,7 @@ const I18N = {
       'Folder tidak bisa dibuat: ': 'Could not create folder: ',
       'Gagal menjalankan yt-dlp: ': 'Failed to start yt-dlp: ',
       'Update gagal: ': 'Update failed: ',
+      'Pencarian gagal: ': 'Search failed: ',
       'Gagal memproses file: ': 'Failed to process file: ',
       'Codec terdeteksi: ': 'Codecs detected: ',
       'yt-dlp terupdate ke versi ': 'yt-dlp updated to version ',
@@ -387,6 +452,10 @@ let msgInfo = null;
 let updating = false;
 let pollTimer = null;
 let currentFile = '';
+let searchResults = [];
+let selectedResultId = null;
+let currentPlaying = null;
+let searchMsgInfo = null;
 
 function $(id) { return document.getElementById(id); }
 function T(key) { return I18N[lang][key] !== undefined ? I18N[lang][key] : key; }
@@ -409,8 +478,11 @@ function setLang(next) {
   document.querySelectorAll('.ghost.lang').forEach((b) => { b.classList.toggle('active', b.dataset.lang === lang); });
   $('btnUpdate').textContent = updating ? T('msgUpdating') : T('btnUpdate');
   paintMsg();
+  paintSearchMsg();
   if (lastTools) paintTools(lastTools);
   if (lastStatus) { lastLogRaw = null; paintStatus(lastStatus); }
+  if (searchResults.length) renderResults();
+  if (currentPlaying) $('playerTitle').textContent = T('playerTitle') + currentPlaying.title;
 }
 
 function paintMsg() {
@@ -423,6 +495,20 @@ function paintMsg() {
 function setMsg(text, cls, key) {
   msgInfo = { raw: text || '', cls: cls || '', key: key || null };
   paintMsg();
+}
+
+function paintSearchMsg() {
+  const el = $('searchMsg');
+  if (!searchMsgInfo) { el.textContent = ''; el.className = 'search-msg'; return; }
+  const text = searchMsgInfo.key
+    ? T(searchMsgInfo.key) + (searchMsgInfo.raw || '')
+    : TR(searchMsgInfo.raw || '');
+  el.textContent = text;
+  el.className = 'search-msg' + (searchMsgInfo.cls ? ' ' + searchMsgInfo.cls : '');
+}
+function setSearchMsg(text, cls, key) {
+  searchMsgInfo = { raw: text || '', cls: cls || '', key: key || null };
+  paintSearchMsg();
 }
 
 function paintTools(data) {
@@ -447,6 +533,102 @@ async function api(path, method, body) {
 
 async function loadTools() {
   try { paintTools(await api('/api/tools')); } catch (e) {}
+}
+
+function fmtDuration(sec) {
+  if (!sec || !isFinite(sec)) return T('durationUnknown');
+  const s = Math.floor(sec);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const ss = String(s % 60).padStart(2, '0');
+  return h ? h + ':' + String(m).padStart(2, '0') + ':' + ss : m + ':' + ss;
+}
+
+function closePlayer() {
+  $('playerBox').hidden = true;
+  $('playerFrame').src = 'about:blank';
+  currentPlaying = null;
+}
+
+function playVideo(v) {
+  if (!v || !/^[A-Za-z0-9_-]{11}$/.test(v.id)) return;
+  currentPlaying = v;
+  $('playerTitle').textContent = T('playerTitle') + v.title;
+  $('playerFrame').src = 'https://www.youtube.com/embed/' + encodeURIComponent(v.id) + '?rel=0';
+  $('playerBox').hidden = false;
+  $('playerBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function pickVideo(v, card) {
+  if (!v) return;
+  selectedResultId = v.id;
+  $('url').value = v.url;
+  document.querySelectorAll('.result').forEach((el) => el.classList.remove('selected'));
+  if (card) card.classList.add('selected');
+  setMsg('', 'ok', 'urlFilled');
+  playVideo(v);
+  $('url').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderResults() {
+  const box = $('searchResults');
+  box.textContent = '';
+  searchResults.forEach((v) => {
+    const card = document.createElement('div');
+    card.className = 'result' + (v.id === selectedResultId ? ' selected' : '');
+
+    const img = document.createElement('img');
+    img.src = v.thumb;
+    img.alt = '';
+    img.loading = 'lazy';
+    img.onerror = () => { img.style.visibility = 'hidden'; };
+
+    const info = document.createElement('div');
+    info.className = 'rinfo';
+    const title = document.createElement('div');
+    title.className = 'rtitle';
+    title.textContent = v.title;
+    const meta = document.createElement('div');
+    meta.className = 'rmeta';
+    meta.textContent = [v.channel, fmtDuration(v.duration)].filter(Boolean).join(' · ');
+    const actions = document.createElement('div');
+    actions.className = 'ractions';
+    const bPlay = document.createElement('button');
+    bPlay.className = 'ghost';
+    bPlay.textContent = T('resultPlay');
+    bPlay.onclick = (e) => { e.stopPropagation(); playVideo(v); };
+    const bPick = document.createElement('button');
+    bPick.className = 'ghost';
+    bPick.textContent = T('resultPick');
+    bPick.onclick = (e) => { e.stopPropagation(); pickVideo(v, card); };
+    actions.appendChild(bPlay);
+    actions.appendChild(bPick);
+    info.appendChild(title);
+    info.appendChild(meta);
+    info.appendChild(actions);
+    card.appendChild(img);
+    card.appendChild(info);
+    card.onclick = () => pickVideo(v, card);
+    box.appendChild(card);
+  });
+}
+
+async function searchVideos() {
+  const q = $('searchInput').value.trim();
+  if (!q) return setSearchMsg('', 'err', 'searchEmpty');
+  const btn = $('btnSearch');
+  btn.disabled = true;
+  setSearchMsg('', '', 'searching');
+  try {
+    const r = await api('/api/search', 'POST', { q: q });
+    searchResults = r.results || [];
+    selectedResultId = null;
+    renderResults();
+    setSearchMsg('', '', searchResults.length ? null : 'noResults');
+  } catch (e) {
+    setSearchMsg(e.message, 'err', 'searchFail');
+  }
+  btn.disabled = false;
 }
 
 async function start() {
@@ -589,6 +771,9 @@ async function poll() {
     }
   }
 }
+
+$('url').addEventListener('keydown', (e) => { if (e.key === 'Enter') start(); });
+$('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchVideos(); });
 
 let saved = 'id';
 try { saved = localStorage.getItem('tvyd-lang') || 'id'; } catch (e) {}
